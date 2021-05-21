@@ -5,21 +5,22 @@ import {useStorage} from '../../reducers/storage/useStorage';
 import {populatePokemonDB} from './Categories.thunks';
 import ItemCard from '../../../src/uikit/ItemCard/ItemCard';
 import SplashScreen from 'react-native-splash-screen';
+import {createStackNavigator} from '@react-navigation/stack';
+import ResourceList from './ResourceList/ResourceList';
 
 const HomeContainer = styled.View`
   background-color: #353535;
 `;
 
-function Categories({navigation}) {
-  const Storage = useStorage();
+const {Navigator, Screen} = createStackNavigator();
 
-  const {abilities, generations, regions, types, versions} =
-    Storage.getFromStorage((state) => state.storage);
+const CategoriesScreen = ({navigation}) => {
+  const Storage = useStorage();
 
   const [refreshing, setRefreshing] = useState(true);
 
   useEffect(() => {
-    Storage.dispatch(populatePokemonDB(50, Storage)).then(() => {
+    Storage.dispatch(populatePokemonDB(5, Storage)).then(() => {
       setRefreshing(false);
     });
   }, []);
@@ -59,15 +60,22 @@ function Categories({navigation}) {
               }
               footerColor={'#3770ec'}
               onPress={() => {
-                navigation.navigate('ResourceList', 'regions');
+                navigation.navigate('ResourceList', {
+                  resourceType: 'regions',
+                });
               }}
             />
             <ItemCard
               title={'Generaciones'}
               size={150}
               footerColor={'#d60d0d'}
+              imageBackgroundSource={
+                'https://sm.ign.com/ign_latam/screenshot/default/pokemonanime-1_tx78.jpg'
+              }
               onPress={() => {
-                navigation.navigate('ResourceList', 'generations');
+                navigation.navigate('ResourceList', {
+                  resourceType: 'generations',
+                });
               }}
             />
             <ItemCard
@@ -91,7 +99,7 @@ function Categories({navigation}) {
                 'https://res.cloudinary.com/lmn/image/upload/c_limit,h_360,w_640/e_sharpen:100/f_auto,fl_lossy,q_auto/v1/gameskinnyc/p/o/k/pokemon-types-image-drewlinne-deviant-art-ac4b2.jpg'
               }
               onPress={() => {
-                navigation.navigate('ResourceList', 'types');
+                navigation.navigate('ResourceList', {resourceType: 'types'});
               }}
             />
             <ItemCard
@@ -102,13 +110,26 @@ function Categories({navigation}) {
                 'https://cdn.shopify.com/s/files/1/1050/5072/products/il_fullxfull.1061776301_frky_large.jpg'
               }
               onPress={() => {
-                navigation.navigate('ResourceList', 'version');
+                navigation.navigate('ResourceList', {resourceType: 'version'});
               }}
             />
           </View>
         </View>
       </ScrollView>
     </HomeContainer>
+  );
+};
+
+function Categories({navigation}) {
+  return (
+    <Navigator initialRouteName={'CategoriesScreen'} headerMode={'none'}>
+      <Screen name={'ResourceList'} component={ResourceList} />
+      <Screen
+        name={'CategoriesScreen'}
+        component={CategoriesScreen}
+        navigation={navigation}
+      />
+    </Navigator>
   );
 }
 

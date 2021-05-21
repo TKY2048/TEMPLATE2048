@@ -30,9 +30,6 @@ export const populatePokemonDB =
       });
     }
 
-    console.log(count, 'count');
-    console.log(state?.pokemon?.length, 'length');
-
     if (
       !('pokemon' in state) ||
       (state?.pokemon?.length ?? count - 1 < count)
@@ -54,6 +51,27 @@ export const populatePokemonDB =
       });
     }
   };
+
+export const getMorePokemon = (Storage) => async (dispatch, getState) => {
+  const storage = getState().storage;
+
+  const currentPokemonIndex = Object.keys(storage?.pokemon).length;
+
+  console.log(currentPokemonIndex, 'currentPokemonIndex');
+
+  return PokemonService.getAllPokemon({
+    offset: currentPokemonIndex,
+    limit: 5,
+  }).then(({results}) => {
+    return Promise.all(
+      results.map((pokemonInfo) => {
+        PokemonService.getPokemonById(pokemonInfo.name).then((pokemon) => {
+          Storage.writeToStorage(`pokemon.${pokemonInfo.name}`, pokemon, true);
+        });
+      }),
+    );
+  });
+};
 
 export default {
   populatePokemonDB,
