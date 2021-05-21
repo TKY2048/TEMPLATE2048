@@ -5,7 +5,7 @@ import {default as app} from './app/app.reducer';
 import {default as storage} from './storage/storage.reducer';
 
 const storagePersistConfig = {
-  key: 'seriesReducer',
+  key: 'storage',
   storage: AsyncStorage,
 };
 
